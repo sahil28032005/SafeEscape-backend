@@ -27,3 +27,30 @@
 - **Backend:** Firebase / Node.js with MongoDB for real-time database.
 - **APIs & Integrations:** Google Maps API, IMD/NDMA data, Twilio for SMS alerts.
 - **AI/ML:** Chatbot for first aid guidance, NLP for multilingual support.
+
+# SafeEscape Backend
+
+## Configuration Setup
+
+### Development Setup
+1. Download service account JSON from Firebase Console
+2. Place it in `config/firebase-serviceAccount.json`
+3. Create `.env` file from `.env.example`
+4. Install dependencies: `npm install`
+5. Run development server: `npm run dev`
+
+### Production Setup
+1. Set all environment variables in your deployment platform
+2. Ensure Firebase service account is properly configured
+3. Run production server: `npm start`
+
+### Security Best Practices
+- Rotate service account keys every 90 days
+- Use restricted service accounts with minimal permissions
+- Monitor Firebase Security Rules
+- Keep credentials secure and never commit them
+
+## Available Scripts
+- `npm start`: Run the production server
+- `npm run dev`: Run development server with nodemon
+- `npm run check-credentials`: Check Firebase credentials age

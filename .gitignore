@@ -50,12 +50,12 @@ ENV/
 *.DS_Store
 Thumbs.db
 
-# Environment variables
+# Environment variables and secrets
 .env
-.env.*
-
-# Config files
-serviceAccountKey.json
+.env.local
+.env.*.local
+firebase-serviceAccount.json
+firebase-serviceAccount.*.json
 
 # Logs
 *.log
@@ -70,4 +70,8 @@ node_modules/
 *.swp
 *.swo
 *.DS_Store
-Thumbs.db 
+Thumbs.db
+
+# Firebase
+firebase-debug.log
+firebase-debug.*.log 

@@ -1,25 +1,35 @@
 const express = require('express');
 const cors = require('cors');
-const routeRoutes = require('./routes/routeRoutes');
-const safeZoneRoutes = require('./routes/safeZoneRoutes');
+const dotenv = require('dotenv');
 
+// Load environment variables
+dotenv.config();
+
+// Initialize express
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
-// Routes
-app.use('/api/routes', routeRoutes);
-app.use('/api/safezones', safeZoneRoutes);
+// Import Routes
+const emergencyRoutes = require('./routes/emergencyRoutes');
+
+// Register Routes
+app.use('/api/emergency', emergencyRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ error: 'Something went wrong!' });
+  res.status(500).json({
+    success: false,
+    error: 'Something went wrong!'
+  });
 });
 
+// Start server
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`📝 Emergency routes available at http://localhost:${PORT}/api/emergency`);
 }); 
