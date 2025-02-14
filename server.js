@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
-const routeRoutes = require('./smart-emergency-backend/routes/routeRoutes');
-const safeZoneRoutes = require('./smart-emergency-backend/routes/safeZoneRoutes');
+const routeRoutes = require('./routes/routeRoutes');
+const safeZoneRoutes = require('./routes/safeZoneRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;

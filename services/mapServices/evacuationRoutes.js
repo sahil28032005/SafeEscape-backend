@@ -28,7 +28,7 @@ class EvacuationRouteService {
     return await googleMapsService.findNearbyPlaces(location, radius, placeType);
   }
 
-  private getSearchRadius(disasterType) {
+  getSearchRadius(disasterType) {
     // Define radius based on disaster type
     const radiusMap = {
       'flood': 5000,
@@ -38,7 +38,7 @@ class EvacuationRouteService {
     return radiusMap[disasterType] || 5000;
   }
 
-  private selectOptimalRoute(routes) {
+  selectOptimalRoute(routes) {
     // Implementation for selecting the best route
     return routes.reduce((best, current) => 
       current.duration < best.duration ? current : best
