@@ -14,10 +14,11 @@ app.use(express.json());
 
 // Import Routes
 const emergencyRoutes = require('./routes/emergencyRoutes');
-
+const userRoutes = require('./routes/userRoutes');
+const routeRoutes = require('./routes/routeRoutes')
 // Register Routes
 app.use('/api/emergency', emergencyRoutes);
-
+app.use('/api/users', userRoutes);  // Mount user routess
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -32,4 +33,7 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📝 Emergency routes available at http://localhost:${PORT}/api/emergency`);
-}); 
+});
+app.get('/ready', (req, res) => {
+  res.json({ message: 'Hello World' });
+});
