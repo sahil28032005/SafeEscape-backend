@@ -1,5 +1,5 @@
 const { Client } = require('@googlemaps/google-maps-services-js');
-const apiKeys = require('../config/apiKeys');
+const apiKeys = require('../config/apiConfig');
 
 const client = new Client({});
 

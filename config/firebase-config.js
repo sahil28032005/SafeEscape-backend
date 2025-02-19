@@ -9,7 +9,7 @@ const initializeFirebase = () => {
         });
 
         const db = admin.firestore();
-        
+
         // Optional: Configure Firestore settings
         db.settings({
             timestampsInSnapshots: true,
@@ -30,7 +30,7 @@ const { admin: firebaseAdmin, db: firestore } = initializeFirebase();
 module.exports = {
     admin: firebaseAdmin,
     db: firestore,
-    
+
     // Collection references
     collections: {
         users: firestore.collection('users'),
@@ -38,7 +38,7 @@ module.exports = {
         routes: firestore.collection('evacuation-routes'),
         shelters: firestore.collection('shelters')
     },
-    
+
     // Firestore field values
     fieldValues: {
         serverTimestamp: admin.firestore.FieldValue.serverTimestamp,
