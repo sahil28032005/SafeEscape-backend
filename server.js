@@ -15,10 +15,12 @@ app.use(express.json());
 // Import Routes
 const emergencyRoutes = require('./routes/emergencyRoutes');
 const mapRoutes = require('./routes/mapRoutes');
+const alertRoutes = require('./routes/alertRoutes');
 
 // Register Routes
 app.use('/api/emergency', emergencyRoutes);
 app.use('/api/maps', mapRoutes);
+app.use('/api/alerts', alertRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
