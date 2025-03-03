@@ -5,9 +5,12 @@
 
 version: 2
 updates:
-  - package-ecosystem: "" # See documentation for possible values
-    directory: "/" # Location of package manifests
+  - package-ecosystem: "npm" # Change this to your package manager (e.g., "pip" for Python, "maven" for Java)
+    directory: "/" # Location of package.json or equivalent file
     schedule:
-      interval: "weekly"
+      interval: "weekly" # Options: "daily", "weekly", "monthly"
+    commit-message:
+      prefix: "fix" # Prefix for the commit message
+    open-pull-requests-limit: 5 # Limit the number of open PRs
 
 
