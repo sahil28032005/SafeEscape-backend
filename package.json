@@ -21,6 +21,7 @@
   "homepage": "https://github.com/amanmogal/SafeEscape-backend#readme",
   "description": "",
   "dependencies": {
+    "@google-cloud/pubsub": "^4.10.0",
     "@google/generative-ai": "^0.22.0",
     "@googlemaps/google-maps-services-js": "^3.4.0",
     "axios": "^1.7.9",

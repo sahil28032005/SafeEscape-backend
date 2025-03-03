@@ -56,6 +56,8 @@ Thumbs.db
 .env.*.local
 firebase-serviceAccount.json
 firebase-serviceAccount.*.json
+gemini-service-account.json
+gemini-service-account.*.json
 
 # Logs
 *.log
