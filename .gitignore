@@ -85,6 +85,9 @@ pubsub-service-account.*.json
 
 # Gemini API credentials
 config/gemini-servie-account.json
-config/gemini-service-account.*.json
+config/gemini-servie-account.*.json
+
+# Ignore service account credentials
+config/vertexai-service-Account.json
 
 

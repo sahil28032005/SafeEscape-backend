@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 
+
 // Load environment variables
 dotenv.config();
 
@@ -17,11 +18,15 @@ const emergencyRoutes = require('./routes/emergencyRoutes');
 const mapRoutes = require('./routes/mapRoutes');
 const alertRoutes = require('./routes/alertRoutes');
 const userRoutes = require('./routes/userRoutes');
+const aiRoutes = require('./routes/aiRoutes');
+
 // Register Routes
 app.use('/api/emergency', emergencyRoutes);
 app.use('/api/maps', mapRoutes);
 app.use('/api/alerts', alertRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/ai', aiRoutes);
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -40,3 +45,4 @@ app.listen(PORT, () => {
 app.get('/ready', (req, res) => {
   res.json({ message: 'Hello World' });
 });
+
