@@ -78,13 +78,13 @@ Thumbs.db
 firebase-debug.log
 firebase-debug.*.log
 
-# Google Gemini and Pub/Sub keys and services
-# Ignore Google Gemini service account keys
-gemini-service-account.json
-gemini-service-account.*.json
 
 # Ignore Google Pub/Sub keys and configuration
 pubsub-service-account.json
 pubsub-service-account.*.json 
 
-config/gemini-service-account.json
+# Gemini API credentials
+config/gemini-servie-account.json
+config/gemini-service-account.*.json
+
+
