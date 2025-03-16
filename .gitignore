@@ -89,5 +89,6 @@ config/gemini-servie-account.*.json
 
 # Ignore service account credentials
 config/vertexai-service-Account.json
+config/pubsub-service-account.json
 
 

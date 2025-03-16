@@ -1,6 +1,11 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const path = require('path');
+const http = require('http');
+const socketIO = require('socket.io');
+const pubSubService = require('./services/pubsub/pubSubService');
+const socketService = require('./services/socket/socketService');
 
 
 // Load environment variables
@@ -27,6 +32,78 @@ app.use('/api/alerts', alertRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/ai', aiRoutes);
 
+// Create HTTP server
+const server = http.createServer(app);
+
+// Initialize Socket.IO
+const io = socketIO(server, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST']
+  }
+});
+
+// Make io available to routes
+app.set('io', io);
+
+// Initialize socket service
+socketService.initialize(io);
+
+// Initialize Pub/Sub service
+pubSubService.initialize().then(() => {
+  console.log('Pub/Sub service initialized');
+  
+  // Subscribe to topics
+  const subscriptions = pubSubService.getSubscriptions();
+  
+  // Set up message handlers
+  pubSubService.subscribeToTopic(
+    subscriptions.EMERGENCY_ALERTS_SUB,
+    (data, attributes) => socketService.handleEmergencyAlert(data, attributes)
+  );
+  
+  pubSubService.subscribeToTopic(
+    subscriptions.EVACUATION_NOTICES_SUB,
+    (data, attributes) => socketService.handleEvacuationNotice(data, attributes)
+  );
+  
+  pubSubService.subscribeToTopic(
+    subscriptions.DISASTER_WARNINGS_SUB,
+    (data, attributes) => socketService.handleDisasterWarning(data, attributes)
+  );
+  
+  pubSubService.subscribeToTopic(
+    subscriptions.SYSTEM_NOTIFICATIONS_SUB,
+    (data, attributes) => socketService.handleSystemNotification(data, attributes)
+  );
+});
+
+// Serve static files for testing
+app.use(express.static('public'));
+
+// Serve the test client
+app.get('/test-pubsub', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/test-pubsub-client.html'));
+});
+app.get('/test-socket', (req, res) => {
+  const testAlert = {
+    id: `test-${Date.now()}`,
+    title: 'Direct Socket.IO Test',
+    message: 'This is a direct test from the server',
+    severity: 'high',
+    location: {
+      city: 'Mumbai',
+      state: 'Maharashtra'
+    }
+  };
+  
+  socketService.broadcast('emergency-alert', {
+    alert: testAlert,
+    attributes: { severity: 'high' }
+  });
+  
+  res.send('Test message sent to all clients');
+});
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -36,13 +113,9 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start server
+// Start the server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📝 Emergency routes available at http://localhost:${PORT}/api/emergency`);
-});
-app.get('/ready', (req, res) => {
-  res.json({ message: 'Hello World' });
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
 
