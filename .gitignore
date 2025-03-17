@@ -86,3 +86,4 @@ gemini-service-account.*.json
 # Ignore Google Pub/Sub keys and configuration
 pubsub-service-account.json
 pubsub-service-account.*.json 
+.qodo

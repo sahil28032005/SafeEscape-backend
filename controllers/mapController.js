@@ -3,7 +3,7 @@ const mapService = require('../services/mapServices/googleMapsClient');
 exports.getEvacuationRoutes = async (req, res) => {
     try {
         const { origin, destination } = req.query;
-        
+
         if (!origin || !destination) {
             return res.status(400).json({
                 success: false,
@@ -83,6 +83,8 @@ exports.getDistanceMatrix = async (req, res) => {
         });
     }
 };
+
+//not important useful for searching only
 
 exports.geocodeLocation = async (req, res) => {
     try {
