@@ -36,7 +36,8 @@ module.exports = {
         users: firestore.collection('users'),
         emergencies: firestore.collection('emergencies'),
         routes: firestore.collection('evacuation-routes'),
-        shelters: firestore.collection('shelters')
+        shelters: firestore.collection('shelters'),
+        disasters: firestore.collection('disasters')
     },
 
     // Firestore field values
