@@ -6,7 +6,7 @@ const http = require('http');
 const socketIO = require('socket.io');
 const pubSubService = require('./services/pubsub/pubSubService');
 const socketService = require('./services/socket/socketService');
-
+const chatbotController = require('./controllers/chatbotController');
 
 // Load environment variables
 dotenv.config();
@@ -31,6 +31,7 @@ app.use('/api/maps', mapRoutes);
 app.use('/api/alerts', alertRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api', chatbotController);
 
 // Create HTTP server
 const server = http.createServer(app);
@@ -119,3 +120,4 @@ server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
+module.exports = app;
