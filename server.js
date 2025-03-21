@@ -6,8 +6,12 @@ const http = require('http');
 const socketIO = require('socket.io');
 const pubSubService = require('./services/pubsub/pubSubService');
 const socketService = require('./services/socket/socketService');
+<<<<<<< HEAD
 const chatbotController = require('./controllers/chatbotController');
 
+=======
+const PushNotificationService = require('./services/notificationServices/pushNotifications/pushNotification');
+>>>>>>> ebd5dce5de76b3e28ee06a13444904e3f6fd774d
 // Load environment variables
 dotenv.config();
 
@@ -49,30 +53,31 @@ app.set('io', io);
 
 // Initialize socket service
 socketService.initialize(io);
-
+console.log("Invoking the push notifications service")
+PushNotificationService.notifyUsersOfDisaster();
 // Initialize Pub/Sub service
 pubSubService.initialize().then(() => {
   console.log('Pub/Sub service initialized');
-  
+
   // Subscribe to topics
   const subscriptions = pubSubService.getSubscriptions();
-  
+
   // Set up message handlers
   pubSubService.subscribeToTopic(
     subscriptions.EMERGENCY_ALERTS_SUB,
     (data, attributes) => socketService.handleEmergencyAlert(data, attributes)
   );
-  
+
   pubSubService.subscribeToTopic(
     subscriptions.EVACUATION_NOTICES_SUB,
     (data, attributes) => socketService.handleEvacuationNotice(data, attributes)
   );
-  
+
   pubSubService.subscribeToTopic(
     subscriptions.DISASTER_WARNINGS_SUB,
     (data, attributes) => socketService.handleDisasterWarning(data, attributes)
   );
-  
+
   pubSubService.subscribeToTopic(
     subscriptions.SYSTEM_NOTIFICATIONS_SUB,
     (data, attributes) => socketService.handleSystemNotification(data, attributes)
@@ -97,12 +102,12 @@ app.get('/test-socket', (req, res) => {
       state: 'Maharashtra'
     }
   };
-  
+
   socketService.broadcast('emergency-alert', {
     alert: testAlert,
     attributes: { severity: 'high' }
   });
-  
+
   res.send('Test message sent to all clients');
 });
 // Error handling middleware
