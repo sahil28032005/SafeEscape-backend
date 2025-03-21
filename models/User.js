@@ -1,32 +1,8 @@
-// const mongoose = require('mongoose');
-
-// const userSchema = new mongoose.Schema({
-//   name: { type: String, required: true },
-//   fcmTokens: [
-//     {
-//       token: { type: String }
-//     }
-//   ],
-//   email: { type: String, required: true, unique: true },
-//   password: { type: String, required: true },
-//   phone: { type: String },
-//   location: {
-//     type: { type: String, default: 'Point' },
-//     coordinates: [Number]
-//   },
-//   emergencyContacts: [{
-//     type: mongoose.Schema.Types.ObjectId,
-//     ref: 'EmergencyContact'
-//   }],
-//   createdAt: { type: Date, default: Date.now }
-// });
-
-// module.exports = mongoose.model('User', userSchema); 
 const { db, collections, fieldValues } = require('../config/firebase-config');
 
 const userModel = {
   /**
-   * Create a new user in Firestore
+   * Create a new user in Firestore (with embedded emergency contacts)
    * @param {Object} userData - User details
    * @returns {string} userId - Firestore document ID
    */
@@ -35,46 +11,56 @@ const userModel = {
       const userRef = await collections.users.add({
         name: userData.name,
         email: userData.email,
-        password: userData.password,  // 🔹 Hash before storing
+        password: userData.password, // Ensure to hash this before storing
         phone: userData.phone || null,
         location: userData.location || null,
-        emergencyContacts: userData.emergencyContacts || [],
         fcmTokens: userData.fcmTokens || [],
+        emergencyContacts: userData.emergencyContacts || [
+          { name: 'Police', phone: '112', relationship: 'Emergency', priority: 1 },
+          { name: 'Fire Brigade', phone: '101', relationship: 'Emergency', priority: 2 },
+          { name: 'Ambulance', phone: '108', relationship: 'Emergency', priority: 3 }
+        ],
         createdAt: fieldValues.serverTimestamp(),
-        updatedAt: fieldValues.serverTimestamp()
+        updatedAt: fieldValues.serverTimestamp(),
       });
+
       return userRef.id;
     } catch (error) {
       console.error('❌ Error creating user:', error.message);
       throw new Error('Failed to create user');
     }
   },
-
   /**
    * Get user details by Email
-   * @param {string} email - User email
+   * @param {string} email - User's email address
    * @returns {Object|null} - User data or null if not found
    */
   async getUserByEmail(email) {
     try {
-      const snapshot = await collections.users.where('email', '==', email).get();
+      const snapshot = await collections.users
+        .where('email', '==', email)
+        .limit(1) // Optimize query with limit
+        .get();
+
       if (snapshot.empty) return null; // No user found
+
       return { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
     } catch (error) {
       console.error('❌ Error fetching user by email:', error.message);
-      throw new Error('Failed to get user');
+      throw new Error('Failed to get user by email');
     }
   },
-
   /**
-   * Get user details by ID
+   * Get user details by ID (with embedded emergency contacts)
    * @param {string} userId - Firestore document ID
    * @returns {Object|null} - User data or null if not found
    */
   async getUserById(userId) {
     try {
       const userDoc = await collections.users.doc(userId).get();
-      return userDoc.exists ? { id: userDoc.id, ...userDoc.data() } : null;
+      if (!userDoc.exists) return null;
+
+      return { id: userDoc.id, ...userDoc.data() };
     } catch (error) {
       console.error('❌ Error fetching user by ID:', error.message);
       throw new Error('Failed to get user');
@@ -82,74 +68,84 @@ const userModel = {
   },
 
   /**
-   * Update an existing user in Firestore
+   * Update emergency contacts for a user
    * @param {string} userId - Firestore document ID
-   * @param {Object} updates - Fields to update
+   * @param {Array} contacts - Array of emergency contacts
    * @returns {boolean} - Success status
    */
-  async updateUser(userId, updates) {
+  async updateEmergencyContacts(userId, contacts) {
+    try {
+      const userRef = collections.users.doc(userId);
+      await userRef.update({
+        emergencyContacts: contacts,
+        updatedAt: fieldValues.serverTimestamp(),
+      });
+      return true;
+    } catch (error) {
+      console.error('❌ Error updating emergency contacts:', error.message);
+      throw new Error('Failed to update emergency contacts');
+    }
+  },
+
+  /**
+   * Add a new emergency contact to a user
+   * @param {string} userId - Firestore document ID
+   * @param {Object} contact - Emergency contact to add
+   * @returns {boolean} - Success status
+   */
+  async addEmergencyContact(userId, contact) {
     try {
       const userRef = collections.users.doc(userId);
       const userDoc = await userRef.get();
 
-      if (!userDoc.exists) throw new Error(`User with ID ${userId} not found`);
+      if (!userDoc.exists) throw new Error('User not found');
+
+      const currentContacts = userDoc.data().emergencyContacts || [];
+
+      // Ensure no duplicate contact based on phone number
+      if (!currentContacts.some((c) => c.phone === contact.phone)) {
+        currentContacts.push(contact);
+        await userRef.update({
+          emergencyContacts: currentContacts,
+          updatedAt: fieldValues.serverTimestamp(),
+        });
+      }
+
+      return true;
+    } catch (error) {
+      console.error('❌ Error adding emergency contact:', error.message);
+      throw new Error('Failed to add emergency contact');
+    }
+  },
+
+  /**
+   * Remove an emergency contact from a user
+   * @param {string} userId - Firestore document ID
+   * @param {string} phone - Phone number to remove
+   * @returns {boolean} - Success status
+   */
+  async removeEmergencyContact(userId, phone) {
+    try {
+      const userRef = collections.users.doc(userId);
+      const userDoc = await userRef.get();
+
+      if (!userDoc.exists) throw new Error('User not found');
+
+      const updatedContacts = (userDoc.data().emergencyContacts || []).filter(
+        (contact) => contact.phone !== phone
+      );
 
       await userRef.update({
-        ...updates,
-        updatedAt: fieldValues.serverTimestamp()
+        emergencyContacts: updatedContacts,
+        updatedAt: fieldValues.serverTimestamp(),
       });
 
       return true;
     } catch (error) {
-      console.error('❌ Error updating user:', error.message);
-      throw new Error('Failed to update user');
+      console.error('❌ Error removing emergency contact:', error.message);
+      throw new Error('Failed to remove emergency contact');
     }
   },
-
-  /**
-   * Add an FCM token to a user
-   * @param {string} userId
-   * @param {string} fcmToken
-   */
-  async addFcmToken(userId, fcmToken) {
-    try {
-      const userRef = collections.users.doc(userId);
-      const userDoc = await userRef.get();
-
-      if (!userDoc.exists) throw new Error('User not found');
-
-      let fcmTokens = userDoc.data().fcmTokens || [];
-
-      // 🔹 Prevent duplicate tokens
-      if (!fcmTokens.includes(fcmToken)) {
-        fcmTokens.push(fcmToken);
-        await userRef.update({ fcmTokens });
-      }
-    } catch (error) {
-      console.error('❌ Error adding FCM token:', error.message);
-      throw new Error('Failed to add FCM token');
-    }
-  },
-
-  /**
-   * Remove an FCM token from a user
-   * @param {string} userId
-   * @param {string} fcmToken
-   */
-  async removeFcmToken(userId, fcmToken) {
-    try {
-      const userRef = collections.users.doc(userId);
-      const userDoc = await userRef.get();
-
-      if (!userDoc.exists) throw new Error('User not found');
-
-      let fcmTokens = (userDoc.data().fcmTokens || []).filter(token => token !== fcmToken);
-      await userRef.update({ fcmTokens });
-    } catch (error) {
-      console.error('❌ Error removing FCM token:', error.message);
-      throw new Error('Failed to remove FCM token');
-    }
-  }
 };
 
 module.exports = userModel;

@@ -78,12 +78,34 @@ Thumbs.db
 firebase-debug.log
 firebase-debug.*.log
 
-# Google Gemini and Pub/Sub keys and services
-# Ignore Google Gemini service account keys
-gemini-service-account.json
-gemini-service-account.*.json
 
 # Ignore Google Pub/Sub keys and configuration
 pubsub-service-account.json
 pubsub-service-account.*.json 
+<<<<<<< HEAD
 .qodo
+=======
+
+# Gemini API credentials
+config/gemini-servie-account.json
+config/gemini-servie-account.*.json
+
+# Ignore service account credentials
+config/vertexai-service-Account.json
+config/pubsub-service-account.json
+
+
+# Service account files and credentials
+**/google-cloud-key.json
+**/vertexai-service-Account.json
+**/firebase-serviceAccount.json
+**/gemini-servie-account.json
+**/*serviceAccount*.json
+**/*service-account*.json
+**/*key*.json
+
+# Do NOT ignore socket service files anymore
+# services/socket/
+config/pubsub-service-account.json
+config/pubsub-service-account.*.json 
+>>>>>>> upstream/main

@@ -3,6 +3,7 @@ const router = express.Router();
 const noaaWeatherService = require('../services/alertServices/noaaWeatherService');
 const usgsEarthquakeService = require('../services/alertServices/usgsEarthquakeService');
 const openFemaService = require('../services/alertServices/openFemaService');
+const openWeatherService = require('../services/alertServices/openWeatherService');
 // NOAA Weather Alerts endpoint
 router.get('/weather/noaa', async (req, res) => {
     try {
@@ -55,4 +56,31 @@ router.get('/weather/openweather/:city', async (req, res) => {
     }
 });
 
+// Add this to your existing alertRoutes.js file
+
+// Weather endpoint
+router.get('/weather/:city', async (req, res) => {
+  try {
+    const { city } = req.params;
+    
+    if (!city) {
+      return res.status(400).json({
+        success: false,
+        error: 'City parameter is required'
+      });
+    }
+    
+    const weatherData = await openWeatherService.getCurrentWeather(city);
+    
+    res.status(200).json({
+      success: true,
+      data: weatherData
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
 module.exports = router;

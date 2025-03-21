@@ -1,37 +1,20 @@
-const { GoogleAuth } = require("google-auth-library");
 const axios = require("axios");
 require("dotenv").config();
-const path = require("path");
-
-async function getAccessToken() {
-    try {
-        const auth = new GoogleAuth({
-            keyFilename: path.resolve(process.env.GOOGLE_APPLICATION_CREDENTIALS),
-            scopes: ["https://www.googleapis.com/auth/cloud-platform"],
-        });
-
-        const client = await auth.getClient();
-        const accessToken = await client.getAccessToken();
-        return accessToken.token;
-    } catch (error) {
-        console.error("❌ Error getting access token:", error);
-    }
-}
 
 async function testGeminiAPI() {
-    const accessToken = await getAccessToken();
-    if (!accessToken) {
-        console.error("❌ Failed to obtain access token.");
+    // Get API key from environment variable
+    const apiKey = process.env.GEMINI_API_KEY;
+    
+    if (!apiKey) {
+        console.error("❌ GEMINI_API_KEY not found in environment variables");
         return;
     }
 
-    const apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent";
+    const apiUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-1.0-pro:generateContent?key=${apiKey}`;
     const headers = {
-        Authorization: `Bearer ${accessToken}`,
         "Content-Type": "application/json",
     };
 
-    // ✅ Corrected Payload Format  
     const requestData = {
         contents: [
             {
