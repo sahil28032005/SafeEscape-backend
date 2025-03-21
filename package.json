@@ -24,7 +24,7 @@
     "@google-cloud/bigquery": "^7.9.2",
     "@google-cloud/pubsub": "^1.1.5",
     "@google-cloud/vertexai": "^1.9.3",
-    "@google/generative-ai": "^0.22.0",
+    "@google/generative-ai": "^0.24.0",
     "@googlemaps/google-maps-services-js": "^3.4.0",
     "axios": "^1.8.3",
     "bcrypt": "^5.1.1",
